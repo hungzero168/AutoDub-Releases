@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDub Pro - Admin Dashboard</title>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./style.css?v=3">
+</head>
+<body>
+    <div id="login-container" class="card">
+        <div class="card-header">
+            <i class="fa-solid fa-shield-halved logo-icon"></i>
+            <h2>AutoDub Pro Admin</h2>
+            <p>Nhập khóa Service Role Key của Supabase để đăng nhập quyền quản trị</p>
+        </div>
+        <div class="form-group">
+            <label for="supabase-service-key">Service Role Key (Mật khẩu Admin)</label>
+            <div class="input-with-icon">
+                <i class="fa-solid fa-key"></i>
+                <input type="password" id="supabase-service-key" placeholder="Nhập supabase service role key...">
+            </div>
+        </div>
+        <button id="btn-login" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+        </button>
+        <div id="login-error" class="error-msg" style="display: none;"></div>
+    </div>
+
+    <div id="dashboard-container" class="layout" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>AutoDub Pro</span>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-tab="licenses-tab">
+                    <i class="fa-solid fa-key"></i> Quản lý License Keys
+                </a>
+                <a href="#" class="menu-item" data-tab="announcement-tab">
+                    <i class="fa-solid fa-bullhorn"></i> Quản lý Thông báo
+                </a>
+                <a href="#" class="menu-item" data-tab="config-tab">
+                    <i class="fa-solid fa-sliders"></i> Cấu hình CMD & Hệ thống
+                </a>
+                <a href="#" class="menu-item" data-tab="analytics-tab">
+                    <i class="fa-solid fa-chart-line"></i> Thống kê & Logs
+                </a>
+                <a href="#" class="menu-item" data-tab="monitor-tab">
+                    <i class="fa-solid fa-satellite-dish"></i> Giám sát Realtime
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btn-logout" class="btn btn-danger btn-block">
+                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="tab-title">Quản lý License Keys</h1>
+                <div class="user-profile">
+                    <span class="badge">Quản trị viên</span>
+                </div>
+            </header>
+
+            <!-- Tab 1: Licenses -->
+            <section id="licenses-tab" class="tab-content active">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="license-search" placeholder="Tìm kiếm key, HWID...">
+                    </div>
+                    <button id="btn-open-create-modal" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Tạo Key Mới
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Status</th>
+                                <th>HWID (Thiết bị)</th>
+                                <th>Ngày hết hạn</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenses-list">
+                            <!-- JS will render rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 2: Announcement -->
+            <section id="announcement-tab" class="tab-content">
+                <div class="action-bar" style="margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <h2>Thông báo toàn hệ thống</h2>
+                        <p style="color: var(--text-muted); font-size: 14px;">Quản lý danh sách các thông báo hiển thị ở trang chủ của ứng dụng khách hàng.</p>
+                    </div>
+                    <button id="btn-open-create-ann-modal" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Tạo Thông báo Mới
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th style="width: 40%">Nội dung</th>
+                                <th>Trạng thái</th>
+                                <th>Luôn hiển thị</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcements-list">
+                            <!-- JS will render rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 3: Config -->
+            <section id="config-tab" class="tab-content">
+                <div class="card settings-card">
+                    <div class="card-header">
+                        <h2>Cấu hình Console (CMD) & Hệ thống</h2>
+                        <p>Điều khiển các cài đặt ẩn/hiện CMD, bảo trì và thông báo nhanh cho ứng dụng khách hàng.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h3>Hiển thị cửa sổ Console (CMD)</h3>
+                                <p>Nếu TẮT, cửa sổ CMD đen của app khách hàng sẽ tự động ẩn đi hoàn toàn khi khởi động.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="config-show-console">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <hr class="divider">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h3>Chế độ Bảo trì (Maintenance Mode)</h3>
+                                <p style="color: var(--danger);">Khóa toàn bộ người dùng, không cho vào giao diện chính khi đang bảo trì hệ thống.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="config-maintenance">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <hr class="divider">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h3>Chế độ Debug (F12 & Console)</h3>
+                                <p style="color: #fbbf24;">Mở khóa tính năng F12/Inspect Element ở máy khách (Dùng để debug khi có lỗi).</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="config-devtool">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <hr class="divider">
+                        <div class="setting-row">
+                            <div class="setting-info" style="width: 100%;">
+                                <h3>Gửi thông báo đẩy (Toast Notification)</h3>
+                                <p>Hiển thị một thông báo nhỏ góc màn hình vài giây rồi tự tắt (Thích hợp cho tin ngắn).</p>
+                                <div class="input-group" style="margin-top: 10px;">
+                                    <input type="text" id="config-toast-msg" placeholder="Ví dụ: Vừa ra mắt giọng Miền Tây mới!">
+                                    <button id="btn-send-toast" class="btn btn-secondary">Phát đi</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+                        <div class="setting-row">
+                            <div class="setting-info" style="width: 100%;">
+                                <h3>Cập nhật Thư viện Venv (requirements.txt)</h3>
+                                <p>Nhập danh sách các thư viện cần nâng cấp ở máy khách (vd: <code>yt-dlp>=2024.03.10</code>). Mỗi dòng một thư viện.</p>
+                                <textarea id="config-requirements" rows="4" placeholder="yt-dlp" style="width: 100%; margin-top: 10px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; font-family: monospace;"></textarea>
+                            </div>
+                        </div>
+                        <hr class="divider">
+                        <button id="btn-save-config" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu cấu hình hệ thống
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: Analytics -->
+            <section id="analytics-tab" class="tab-content">
+                <div class="action-bar" style="margin-bottom: 20px;">
+                    <div class="stat-card" style="background: var(--bg-darker); padding: 20px; border-radius: 8px; flex: 1; border: 1px solid var(--border-color); text-align: center;">
+                        <h3 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 10px;">Người dùng mở app hôm nay</h3>
+                        <div id="stat-active-users" style="font-size: 32px; font-weight: bold; color: var(--primary);">0</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-darker); padding: 20px; border-radius: 8px; flex: 1; border: 1px solid var(--border-color); text-align: center; margin-left: 15px;">
+                        <h3 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 10px;">Số lỗi ghi nhận (Crash)</h3>
+                        <div id="stat-crash-count" style="font-size: 32px; font-weight: bold; color: var(--danger);">0</div>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="log-search" placeholder="Tìm kiếm theo HWID...">
+                    </div>
+                    <button id="btn-delete-logs" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i> Xóa tất cả log
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 150px;">Thời gian</th>
+                                <th style="width: 150px;">HWID (Thiết bị)</th>
+                                <th>Nội dung lỗi (Error Message)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crash-logs-list">
+                            <!-- JS will render rows here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: 15px;">
+                    <button id="btn-log-prev" class="btn btn-secondary" disabled>
+                        <i class="fa-solid fa-chevron-left"></i> Trang trước
+                    </button>
+                    <span id="log-page-info" style="color: var(--text-secondary);">Trang 1 / 1</span>
+                    <button id="btn-log-next" class="btn btn-secondary" disabled>
+                        Trang sau <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab 5: Realtime Monitor -->
+            <section id="monitor-tab" class="tab-content">
+                <div class="action-bar">
+                    <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+                        <i class="fa-solid fa-circle-info"></i> Hiển thị toàn bộ lịch sử thiết bị. Máy đang mở app trong vòng 2 phút qua sẽ có màu xanh (Online), ngược lại là màu xám (Offline). Những máy không có key hợp lệ sẽ bị bôi đỏ.
+                    </p>
+                    <button id="btn-refresh-monitor" class="btn btn-primary">
+                        <i class="fa-solid fa-rotate-right"></i> Làm mới
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Trạng thái</th>
+                                <th>HWID (Thiết bị)</th>
+                                <th>License Key</th>
+                                <th>IP & Version</th>
+                                <th>Lần Ping cuối</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monitor-list">
+                            <!-- JS will render rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Create/Edit License Modal -->
+    <div id="license-modal" class="modal" style="display: none;">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3 id="modal-title">Tạo License Key Mới</h3>
+                <span class="close-modal" id="btn-close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-license-key">License Key</label>
+                    <div class="input-group">
+                        <input type="text" id="modal-license-key" placeholder="Bỏ trống để tự động sinh key ngẫu nhiên...">
+                        <button id="btn-generate-key" class="btn btn-secondary">Ngẫu nhiên</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modal-license-days">Thời hạn sử dụng</label>
+                    <select id="modal-license-days">
+                        <option value="30">30 Ngày (1 Tháng)</option>
+                        <option value="90">90 Ngày (3 Tháng)</option>
+                        <option value="365">365 Ngày (1 Năm)</option>
+                        <option value="-1">Vĩnh viễn (Không hết hạn)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modal-license-status">Trạng thái ban đầu</label>
+                    <select id="modal-license-status">
+                        <option value="active">Kích hoạt (Active)</option>
+                        <option value="blocked">Khóa key (Blocked)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-cancel-modal" class="btn btn-secondary">Hủy</button>
+                <button id="btn-create-key" class="btn btn-primary">Tạo Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Announcement Modal -->
+    <div id="announcement-modal" class="modal" style="display: none;">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3 id="modal-ann-title">Tạo Thông báo Mới</h3>
+                <span class="close-modal" id="btn-close-ann-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modal-ann-id">
+                <div class="form-group">
+                    <label for="announcement-title">Tiêu đề thông báo</label>
+                    <input type="text" id="announcement-title" placeholder="Nhập tiêu đề thông báo...">
+                </div>
+                <div class="form-group">
+                    <label for="announcement-content" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Nội dung thông báo</span>
+                        <button type="button" id="btn-insert-link" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 12px;">
+                            <i class="fa-solid fa-link"></i> Chèn Link
+                        </button>
+                    </label>
+                    <textarea id="announcement-content" rows="6" placeholder="Nhập nội dung thông báo... Bạn có thể bôi đen chữ rồi bấm Chèn Link."></textarea>
+                    <small style="color: #888; font-size: 12px;">Hỗ trợ chèn link theo cú pháp: <code>[Chữ hiển thị](https://link.com)</code></small>
+                </div>
+                <div class="form-group row-inline">
+                    <label for="announcement-active">Trạng thái hiển thị</label>
+                    <label class="switch">
+                        <input type="checkbox" id="announcement-active">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="form-group row-inline">
+                    <label for="announcement-always-show">Luôn hiển thị (Dù khách đã bấm X tắt đi thì mở app vẫn hiện lại)</label>
+                    <label class="switch">
+                        <input type="checkbox" id="announcement-always-show">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-cancel-ann-modal" class="btn btn-secondary">Hủy</button>
+                <button id="btn-save-announcement" class="btn btn-primary">Lưu Thông báo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast" style="display: none;">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-message">Thông báo thành công!</span>
+    </div>
+
+    <script src="./admin_v7.js?v=8"></script>
+</body>
+</html>
